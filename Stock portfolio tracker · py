@@ -1,0 +1,132 @@
+# Stock Portfolio Tracker
+# Calculates the total value of a user's stock investments
+
+STOCK_PRICES = {
+    "AAPL":  {"name": "Apple",                 "price": 213.55},
+    "TSLA":  {"name": "Tesla",                 "price": 248.42},
+    "MSFT":  {"name": "Microsoft",             "price": 468.82},
+    "GOOGL": {"name": "Alphabet",              "price": 178.34},
+    "AMZN":  {"name": "Amazon",                "price": 205.19},
+    "NVDA":  {"name": "NVIDIA",                "price": 135.58},
+    "META":  {"name": "Meta",                  "price": 682.11},
+    "NFLX":  {"name": "Netflix",               "price": 1321.04},
+    "BRK.B": {"name": "Berkshire Hathaway B",  "price": 529.41},
+    "JPM":   {"name": "JPMorgan Chase",        "price": 275.88},
+    "V":     {"name": "Visa",                  "price": 343.22},
+    "UNH":   {"name": "UnitedHealth",          "price": 283.57},
+    "JNJ":   {"name": "Johnson & Johnson",     "price": 159.74},
+    "WMT":   {"name": "Walmart",               "price": 105.35},
+    "DIS":   {"name": "Disney",                "price": 111.28},
+}
+
+
+def display_available_stocks():
+    print("\n" + "=" * 50)
+    print("  Available Stocks")
+    print("=" * 50)
+    print(f"  {'Symbol':<8} {'Company':<26} {'Price':>8}")
+    print("-" * 50)
+    for symbol, info in STOCK_PRICES.items():
+        print(f"  {symbol:<8} {info['name']:<26} ${info['price']:>7.2f}")
+    print("=" * 50)
+
+
+def display_portfolio(portfolio):
+    if not portfolio:
+        print("\n  Your portfolio is empty.\n")
+        return
+
+    print("\n" + "=" * 65)
+    print("  Your Portfolio")
+    print("=" * 65)
+    print(f"  {'Symbol':<8} {'Company':<26} {'Price':>9} {'Qty':>5} {'Value':>10}")
+    print("-" * 65)
+
+    total = 0.0
+    for symbol, qty in portfolio.items():
+        info = STOCK_PRICES[symbol]
+        value = info["price"] * qty
+        total += value
+        print(f"  {symbol:<8} {info['name']:<26} ${info['price']:>8.2f} {qty:>5} ${value:>9.2f}")
+
+    print("-" * 65)
+    print(f"  {'TOTAL PORTFOLIO VALUE':>50} ${total:>9.2f}")
+    print("=" * 65)
+
+    if portfolio:
+        top_symbol = max(portfolio, key=lambda s: STOCK_PRICES[s]["price"] * portfolio[s])
+        top_value = STOCK_PRICES[top_symbol]["price"] * portfolio[top_symbol]
+        avg_value = total / len(portfolio)
+        print(f"\n  Holdings   : {len(portfolio)}")
+        print(f"  Top holding: {top_symbol} — {STOCK_PRICES[top_symbol]['name']} (${top_value:,.2f})")
+        print(f"  Avg/stock  : ${avg_value:,.2f}\n")
+
+
+def get_stock_input():
+    symbol = input("\n  Enter stock symbol (or 'done' to finish): ").strip().upper()
+    return symbol
+
+
+def get_quantity_input(symbol):
+    while True:
+        try:
+            qty = int(input(f"  Enter quantity for {symbol}: ").strip())
+            if qty < 1:
+                print("  Quantity must be at least 1. Try again.")
+            else:
+                return qty
+        except ValueError:
+            print("  Please enter a valid whole number.")
+
+
+def main():
+    print("\n" + "=" * 50)
+    print("       STOCK PORTFOLIO TRACKER")
+    print("=" * 50)
+
+    portfolio = {}
+
+    display_available_stocks()
+
+    print("\n  Add stocks to your portfolio.")
+    print("  Type 'list' to see available stocks.")
+    print("  Type 'view' to view your current portfolio.")
+    print("  Type 'done' when finished.\n")
+
+    while True:
+        symbol = get_stock_input()
+
+        if symbol == "DONE":
+            break
+        elif symbol == "LIST":
+            display_available_stocks()
+            continue
+        elif symbol == "VIEW":
+            display_portfolio(portfolio)
+            continue
+        elif symbol not in STOCK_PRICES:
+            print(f"  '{symbol}' not found. Type 'list' to see available stocks.")
+            continue
+
+        info = STOCK_PRICES[symbol]
+        print(f"  {symbol} — {info['name']} | Price: ${info['price']:.2f}")
+
+        qty = get_quantity_input(symbol)
+
+        if symbol in portfolio:
+            portfolio[symbol] += qty
+            print(f"  Updated {symbol}: total quantity is now {portfolio[symbol]}.")
+        else:
+            portfolio[symbol] = qty
+            print(f"  Added {qty} share(s) of {symbol}.")
+
+    display_portfolio(portfolio)
+
+    if not portfolio:
+        print("  No stocks were added. Exiting.\n")
+    else:
+        print("  Thank you for using the Stock Portfolio Tracker!\n")
+
+
+if __name__ == "__main__":
+    main()
